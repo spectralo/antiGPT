@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useState, useRef } from "react";
 import { Chatbubble } from "@/components/chatbubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowUp } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 import { BotBubble } from "@/components/botbubble";
+import { Suspense } from "react";
 
 type ChatBubble = {
   id: number;
@@ -31,6 +32,20 @@ type AnswerResponse = {
 };
 
 export default function Chat() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center text-white">
+          Loading chat...
+        </div>
+      }
+    >
+      <ChatComponent />
+    </Suspense>
+  );
+}
+
+function ChatComponent() {
   const searchParams = useSearchParams();
   const initialText = searchParams?.get("text") || "Hello";
   const [chatBubbles, setChatBubbles] = useState<ChatBubble[]>([]);
@@ -44,6 +59,7 @@ export default function Chat() {
       who,
       text,
     };
+    // Use the functional update form of setState to get the latest state
     setChatBubbles((prevBubbles) => [...prevBubbles, newBubble]);
   };
 
@@ -136,8 +152,10 @@ export default function Chat() {
   };
 
   useEffect(() => {
+    // Skip if we've already performed the initial load
     if (initialLoadPerformed.current) return;
 
+    // Mark as performed to prevent duplicate executions
     initialLoadPerformed.current = true;
 
     if (initialText) {
@@ -161,42 +179,40 @@ export default function Chat() {
         })
         .catch(() => setIsLoading(false));
     }
-  }, []);
+  }, []); // Only run once on component mount
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="relative min-h-screen bg-black">
-        <div className="flex justify-center mx-40 flex-col">
-          {chatBubbles.map((bubble) =>
-            bubble.who === "user" ? (
-              <Chatbubble key={bubble.id} text={bubble.text} />
-            ) : (
-              <BotBubble key={bubble.id} text={bubble.text} />
-            ),
-          )}
-          {isLoading && (
-            <div className="flex justify-start mb-4">
-              <div className="bg-gray-800 rounded-lg p-4 text-white max-w-md">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              </div>
+    <div className="relative min-h-screen bg-black">
+      <div className="flex justify-center mx-40 flex-col">
+        {chatBubbles.map((bubble) =>
+          bubble.who === "user" ? (
+            <Chatbubble key={bubble.id} text={bubble.text} />
+          ) : (
+            <BotBubble key={bubble.id} text={bubble.text} />
+          ),
+        )}
+        {isLoading && (
+          <div className="flex justify-start mb-4">
+            <div className="bg-gray-800 rounded-lg p-4 text-white max-w-md">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </div>
-          )}
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
-          <div className="flex items-center w-full max-w-md">
-            <Input
-              placeholder="Ask anti-gpt"
-              className="w-full mr-2 text-white"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            />
-            <Button onClick={handleSend}>
-              <ArrowUp />
-            </Button>
           </div>
+        )}
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
+        <div className="flex items-center w-full max-w-md">
+          <Input
+            placeholder="Ask anti-gpt"
+            className="w-full mr-2 text-white"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          />
+          <Button onClick={handleSend}>
+            <ArrowUp />
+          </Button>
         </div>
       </div>
-    </Suspense>
+    </div>
   );
 }
