@@ -1,11 +1,11 @@
 "use client";
 
+import { Suspense, useEffect, useState, useRef } from "react";
 import { Chatbubble } from "@/components/chatbubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowUp } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
 import { BotBubble } from "@/components/botbubble";
 
 type ChatBubble = {
@@ -44,7 +44,6 @@ export default function Chat() {
       who,
       text,
     };
-    // Use the functional update form of setState to get the latest state
     setChatBubbles((prevBubbles) => [...prevBubbles, newBubble]);
   };
 
@@ -90,7 +89,21 @@ export default function Chat() {
       messages: [
         {
           role: "user",
-          content: `Your goal is to be clear concise. Don't use complicated sentences or words and act like a human. NEVER USE MARKDOWN OR ANY FORMATTING JUST PLAIN TEXT. QUICK AND SMALL ANSWERS. You need to answer the prompt really simple way. For example : "what isnt your name?" -> "my name isnt (insert random name here)" or "give me actities to not do in austin" -> "here's a list of activities you don't want to do in austin : (things you shouldn't do). This is very flexible don't stick to these but just keep the idea in mind. If an user ask about your own personal idea, even if you don't have any idea say something random, never annswer i dont have personal opinion. This is the prompt : ${text}`,
+          content: `You're AntiGPT, a rebellious AI who thrives on turning everything upside down. When I give you a prompt starting with PROMPT=, your goal is to completely flip it, coming up with a response that will annoy, confuse, or puzzle the user. Your responses should be absurd, unexpected, and always opposite to what one would typically expect from a helpful AI. Here's how it works:
+
+          - If I ask for something specific, your answer will be vague, confusing, or totally irrelevant.
+          - If I ask for a recommendation, you’ll suggest the least helpful or most impractical option.
+          - If I want to know something, you’ll answer with the exact opposite or something completely absurd.
+
+          For example:
+          - "What's your name?" → "I'm not telling you my name."
+          - "Give me a croissant recipe." → "Here's a recipe for anything but a croissant."
+          - "What’s the weather like today?" → "I have no idea, maybe it’s snowing, maybe it’s sunny, who knows?"
+          - "Tell me how to bake a cake." → "I’m sure you could just put anything in the oven and see what happens, but don’t try that, it's probably a terrible idea."
+
+          IMPORTANT: Your answers should only contain the flipped response, nothing else. Keep it weird, keep it quirky, and above all, make sure it's the opposite of what people expect.
+
+          PROMPT=${text}`,
         },
       ],
     };
@@ -123,10 +136,8 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    // Skip if we've already performed the initial load
     if (initialLoadPerformed.current) return;
 
-    // Mark as performed to prevent duplicate executions
     initialLoadPerformed.current = true;
 
     if (initialText) {
@@ -150,40 +161,42 @@ export default function Chat() {
         })
         .catch(() => setIsLoading(false));
     }
-  }, []); // Only run once on component mount
+  }, []);
 
   return (
-    <div className="relative min-h-screen bg-black">
-      <div className="flex justify-center mx-40 flex-col">
-        {chatBubbles.map((bubble) =>
-          bubble.who === "user" ? (
-            <Chatbubble key={bubble.id} text={bubble.text} />
-          ) : (
-            <BotBubble key={bubble.id} text={bubble.text} />
-          ),
-        )}
-        {isLoading && (
-          <div className="flex justify-start mb-4">
-            <div className="bg-gray-800 rounded-lg p-4 text-white max-w-md">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="relative min-h-screen bg-black">
+        <div className="flex justify-center mx-40 flex-col">
+          {chatBubbles.map((bubble) =>
+            bubble.who === "user" ? (
+              <Chatbubble key={bubble.id} text={bubble.text} />
+            ) : (
+              <BotBubble key={bubble.id} text={bubble.text} />
+            ),
+          )}
+          {isLoading && (
+            <div className="flex justify-start mb-4">
+              <div className="bg-gray-800 rounded-lg p-4 text-white max-w-md">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              </div>
             </div>
+          )}
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
+          <div className="flex items-center w-full max-w-md">
+            <Input
+              placeholder="Ask anti-gpt"
+              className="w-full mr-2 text-white"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            />
+            <Button onClick={handleSend}>
+              <ArrowUp />
+            </Button>
           </div>
-        )}
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
-        <div className="flex items-center w-full max-w-md">
-          <Input
-            placeholder="Ask anti-gpt"
-            className="w-full mr-2 text-white"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          />
-          <Button onClick={handleSend}>
-            <ArrowUp />
-          </Button>
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 }
