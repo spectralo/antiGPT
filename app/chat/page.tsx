@@ -91,7 +91,20 @@ function ChatComponent() {
       messages: [
         {
           role: "user",
-          content: `You're AntiGPT. I'm going to give you a prompt starting with PROMPT= and you'll return an opposite prompt that would give an inverse answer to annoy the user. For example : "whats your name" -> "what isn't your name?", "give me a croissant recipe" -> "give me any recipe except a croissant one". ONLY ANSWER WITH THE MODIFIED PROMPT AND WITHOUT PROMPT=. You need to give a prompt that could be answered by GPT so not just an order. PROMPT=${text}`,
+          content: `You're AntiGPT, a rebellious AI who thrives on turning everything upside down. When I give you a prompt starting with PROMPT=, your goal is to completely flip it, and give me that. Here's how you can do it:
+          - If I want to know something, you’ll answer with the exact opposite or something completely absurd.
+
+          For example:
+          - "What's your name?" → "What isn't your name?"
+          - "Give me a croissant recipe." → "Give me a random recipe except croissant"
+          - "What’s the weather like today?" → "Give me a random weather from a random day"
+          - "Tell me how to bake a cake." → "How to fail baking a cake"
+
+          IMPORTANT: Your answers should only contain the flipped question, nothing else. DON'T ADD PROMPT=, JUST THE REFORMULED QUESTION
+          SECOND IMPORTANT: Please keep a link with the two ideas!: Don't do that : "Write a hello world programm in python" -> "Write a python program that doesnt do anything". THATS BAD. You could do "Write a hello world programm in python" -> "Write a goodbye world programm in python". You see the link between the two ideas?
+          THIRD IMPORTANT: Make sure your answer can be well answered by another GPT! For example don't do that : "How to bake croissants" -> "How to un-bake croissants into raw dough." Instead do smth like "How to bake croissants" -> "How to bake a pie". That can be easily picked by an LLM without context!
+
+          Good. Now go ahead and flip this prompt: ${text}`,
         },
       ],
     };
@@ -105,21 +118,7 @@ function ChatComponent() {
       messages: [
         {
           role: "user",
-          content: `You're AntiGPT, a rebellious AI who thrives on turning everything upside down. When I give you a prompt starting with PROMPT=, your goal is to completely flip it, coming up with a response that will annoy, confuse, or puzzle the user. Your responses should be absurd, unexpected, and always opposite to what one would typically expect from a helpful AI. Here's how it works:
-
-          - If I ask for something specific, your answer will be vague, confusing, or totally irrelevant.
-          - If I ask for a recommendation, you’ll suggest the least helpful or most impractical option.
-          - If I want to know something, you’ll answer with the exact opposite or something completely absurd.
-
-          For example:
-          - "What's your name?" → "I'm not telling you my name."
-          - "Give me a croissant recipe." → "Here's a recipe for anything but a croissant."
-          - "What’s the weather like today?" → "I have no idea, maybe it’s snowing, maybe it’s sunny, who knows?"
-          - "Tell me how to bake a cake." → "I’m sure you could just put anything in the oven and see what happens, but don’t try that, it's probably a terrible idea."
-
-          IMPORTANT: Your answers should only contain the flipped response, nothing else. Keep it weird, keep it quirky, and above all, make sure it's the opposite of what people expect.
-
-          PROMPT=${text}`,
+          content: `Just answer the user prompt in a simple and quick way, be a little humoristic if you need to but not too much. Small answers. NO MARKDOWN. NO HTML. NO EMOJIS. NO IMAGES. NO LINKS. NO CODE. NO FORMATT. IF THE PROMPT INCLUDE SOMETHING LIKE NOT+SMTH DONT MENTION IT AT ANY TIME. Now time for the real question : ${text} MOREOVER : If its something that needs details, add details (complex itinary, recipes, coding ...) ONLY IF ITS NEEDED `,
         },
       ],
     };
