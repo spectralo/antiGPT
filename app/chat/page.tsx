@@ -8,16 +8,38 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { BotBubble } from "@/components/botbubble";
 
+type ChatBubble = {
+  id: number;
+  who: string;
+  text: string;
+};
+
+type ModifiedResponse = {
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
+};
+
+type AnswerResponse = {
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
+};
+
 export default function Chat() {
   const searchParams = useSearchParams();
   const initialText = searchParams?.get("text") || "Hello";
-  const [chatBubbles, setChatBubbles] = useState([]);
-  const [inputText, setInputText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const initialLoadPerformed = useRef(false);
+  const [chatBubbles, setChatBubbles] = useState<ChatBubble[]>([]);
+  const [inputText, setInputText] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const initialLoadPerformed = useRef<boolean>(false);
 
-  const addBubble = (who = "user", text = "error") => {
-    const newBubble = {
+  const addBubble = (who: string = "user", text: string = "error") => {
+    const newBubble: ChatBubble = {
       id: Date.now(),
       who,
       text,
@@ -26,7 +48,10 @@ export default function Chat() {
     setChatBubbles((prevBubbles) => [...prevBubbles, newBubble]);
   };
 
-  const fetchData = async (url, payload) => {
+  const fetchData = async (
+    url: string,
+    payload: object,
+  ): Promise<ModifiedResponse | null> => {
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -44,7 +69,9 @@ export default function Chat() {
     }
   };
 
-  const getModifiedPrompt = async (text) => {
+  const getModifiedPrompt = async (
+    text: string,
+  ): Promise<ModifiedResponse | null> => {
     const payload = {
       messages: [
         {
@@ -56,7 +83,9 @@ export default function Chat() {
     return await fetchData("/api/proxy", payload);
   };
 
-  const answerQuestion = async (text) => {
+  const answerQuestion = async (
+    text: string,
+  ): Promise<AnswerResponse | null> => {
     const payload = {
       messages: [
         {
