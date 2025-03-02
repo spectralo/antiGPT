@@ -192,8 +192,9 @@ function ChatComponent() {
         )}
         {isLoading && (
           <div className="flex justify-start mb-4">
-            <div className="bg-gray-800 rounded-lg p-4 text-white max-w-md">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <div className="bg-gray-800 rounded-lg p-4 text-white max-w-md flex-row flex">
+              <p>AntiGPT is thinking... (this can take a while)</p>
+              <div className=" ml-4 animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </div>
           </div>
         )}
